@@ -1,0 +1,7 @@
+POST /api/books → Add new book
+
+GET /api/books → Get all books with pagination & sorting
+
+GET /api/books/search/title?title=xyz → Search by title
+
+GET /api/books/search/author?author=abc → Search by author
