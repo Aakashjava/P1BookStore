@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Book</title>
+    <style>
+		header {
+				     background-color: rgba(0, 0, 0, 0.7);
+				     color: white;
+				     padding: 15px 20px;
+				     display: flex;
+				     justify-content: space-between;
+				     align-items: center;
+				   }
+
+				   .nav-left a, .nav-right a {
+				     color: white;
+				     margin: 0 10px;
+				     text-decoration: none;
+				     font-weight: bold;
+				   }
+
+				   .nav-right {
+				     display: flex;
+				     align-items: center;
+				   }
+
+				   .nav-left a:hover, .nav-right a:hover {
+				     text-decoration: underline;
+				   }
+				
+		
+		
+		
+        body {
+            margin: 0;
+            padding: 0;
+			
+            background-image: url('/images/9120735.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            max-width: 400px;
+            margin: 100px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+			
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .results {
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .book-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .book-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+	<header>
+		    <div class="nav-left">
+		      <a href="/book.html">Home</a>
+		      <a href="/add-book.html">Add Book</a>
+		      <a href="/book.html">All Books</a>
+		      <a href="/search-book.html">Search</a>
+		    </div>
+			<div class="nav-right">
+			     <a href="#" onclick="logout()">Logout</a>
+			   </div>
+		  </header>
+		  
+<h2>Search Book</h2>
+<form id="searchForm">
+    <div>
+        <label for="searchType">Search by</label>
+        <select id="searchType" name="searchType">
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+        </select>
+    </div>
+    <div>
+        <label for="searchQuery">Search Query</label>
+        <input type="text" id="searchQuery" name="searchQuery" required placeholder="Enter search term">
+    </div>
+    <button type="submit">Search</button>
+</form>
+
+<div class="results" id="results"></div>
+
+<script>
+    // Handle search form submission
+    document.getElementById("searchForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        // Get search parameters
+        const searchType = document.getElementById("searchType").value;
+        const searchQuery = document.getElementById("searchQuery").value;
+
+        // Determine the correct search endpoint based on search type
+        let searchEndpoint = "";
+        if (searchType === "title") {
+            searchEndpoint = `/api/books/search/title?title=${searchQuery}`;
+        } else if (searchType === "author") {
+            searchEndpoint = `/api/books/search/author?author=${searchQuery}`;
+        }
+
+        // Fetch search results
+        fetch(searchEndpoint)
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById("results");
+                resultsDiv.innerHTML = ""; // Clear previous results
+
+                if (data.content && data.content.length > 0) {
+                    // Display search results
+                    data.content.forEach(book => {
+                        const bookItem = document.createElement("div");
+                        bookItem.classList.add("book-item");
+                        bookItem.innerHTML = `<strong>Title:</strong> ${book.title}<br>
+                                              <strong>Author:</strong> ${book.author}<br>
+                                              <strong>Price:</strong> $${book.price}`;
+                        resultsDiv.appendChild(bookItem);
+                    });
+                } else {
+                    // No results found
+                    resultsDiv.innerHTML = "No books found.";
+                }
+            })
+            .catch(error => {
+                document.getElementById("results").innerHTML = "Error fetching results.";
+            });
+    });
+</script>
+
+</body>
+</html>

@@ -45,4 +45,17 @@ public class BookController {
             @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(bookService.searchByAuthor(author, page, size));
     }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book book) {
+        Book updatedBook = bookService.updateBook(id, book);
+        return new ResponseEntity<>(updatedBook, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return new ResponseEntity<>("Book deleted successfully", HttpStatus.OK);
+    }
+
 }

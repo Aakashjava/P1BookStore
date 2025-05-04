@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Signup</title>
+	<style>
+	    body {
+	      margin: 0;
+	      padding: 0;
+	      background-image: url('/images/imageBack.jpg'); /* Replace with your image URL */
+	      background-size: cover;
+	      background-position: center;
+	      font-family: Arial, sans-serif;
+	    }
+
+	    form {
+	      background-color: rgba(255, 255, 255, 0.9);
+	      padding: 30px;
+	      max-width: 300px;
+	      margin: 100px auto;
+	      border-radius: 10px;
+	      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	    }
+
+	    input, button {
+	      width: 100%;
+	      padding: 10px;
+	      margin: 10px 0;
+	    }
+
+	    a {
+	      display: block;
+	      text-align: center;
+	      margin-top: 10px;
+	      color: #007bff;
+	      text-decoration: none;
+	    }
+
+	    a:hover {
+	      text-decoration: underline;
+	    }
+	  </style>
+
+</head>
+<body>
+  <form id="signupForm">
+    <input type="text" id="username" required placeholder="Username"><br>
+    <input type="password" id="password" required placeholder="Password"><br>
+    <button type="submit">Signup here</button>
+	<a href="/login.html">login</a>
+  </form>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+      };
+      fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.ok ? window.location.href = "/login.html" : alert("Signup failed"));
+    });
+  </script>
+</body>
+</html>

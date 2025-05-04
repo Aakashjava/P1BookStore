@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book List</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('/images/imageBack.jpg');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Header */
+    header {
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-left a, .nav-right a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left a:hover, .nav-right a:hover {
+      text-decoration: underline;
+    }
+
+    /* Main Content */
+    main {
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.85);
+      margin: 20px auto;
+      max-width: 800px;
+      border-radius: 10px;
+    }
+
+    /* Footer */
+    footer {
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+
+    /* Book entries */
+    #books div {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-left">
+      <a href="/book.html">Home</a>
+      <a href="/add-book.html">Add Book</a>
+      <a href="/book.html">All Books</a>
+      <a href="/search-book.html">Search</a>
+    </div>
+	<div class="nav-right">
+	     <a href="#" onclick="logout()">Logout</a>
+	   </div>
+  </header>
+
+  <main>
+	<h2>All Books</h2>
+
+	  <!-- Search by author -->
+	  <input type="text" id="authorSearch" placeholder="Search by Author" />
+	  <button onclick="searchByAuthor()">Search</button>
+
+	  <!-- Book list -->
+	  <div id="books">Loading books...</div>
+
+	  <!-- Pagination -->
+	  <button onclick="previousPage()">Previous</button>
+	  <button onclick="nextPage()">Next</button>
+  </main>
+
+  <footer>
+    &copy; 2025 BookStore App. All rights reserved.
+  </footer>
+
+ 
+	<script>
+	  
+
+	  function logout() {
+	      fetch("/api/auth/logout", { method: "POST" })
+	        .then(() => window.location.href = "/login.html");
+	    }
+		
+		let currentPage = 0;
+		const pageSize = 5;
+			  
+	  function fetchBooks() {
+	    fetch(`/api/books?page=${currentPage}&size=${pageSize}&sortBy=id`)
+	      .then(res => res.json())
+	      .then(data => {
+	        const booksDiv = document.getElementById("books");
+	        const books = data.content;
+	        if (books.length === 0) {
+	          booksDiv.innerHTML = "<p>No books available.</p>";
+	        } else {
+	          booksDiv.innerHTML = books.map(book =>
+	            `<div>
+	              <strong>${book.title}</strong> by ${book.author}
+	              <button onclick="deleteBook(${book.id})">Delete</button>
+	            </div>`
+	          ).join("");
+	        }
+	      })
+	      .catch(() => {
+	        document.getElementById("books").innerHTML = "<p>Error fetching books.</p>";
+	      });
+	  }
+
+	  function searchByAuthor() {
+	    const author = document.getElementById("authorSearch").value;
+	    fetch(`/api/books/search/author?author=${encodeURIComponent(author)}&page=0&size=5`)
+	      .then(res => res.json())
+	      .then(data => {
+	        const booksDiv = document.getElementById("books");
+	        const books = data.content;
+	        if (books.length === 0) {
+	          booksDiv.innerHTML = "<p>No books found.</p>";
+	        } else {
+	          booksDiv.innerHTML = books.map(book =>
+	            `<div>
+	              <strong>${book.title}</strong> by ${book.author}
+	              <button onclick="deleteBook(${book.id})">Delete</button>
+	            </div>`
+	          ).join("");
+	        }
+	      });
+	  }
+
+	  function deleteBook(id) {
+	    fetch(`/api/books/${id}`, { method: 'DELETE' })
+	      .then(() => fetchBooks());
+	  }
+
+	  function previousPage() {
+	    if (currentPage > 0) {
+	      currentPage--;
+	      fetchBooks();
+	    }
+	  }
+
+	  function nextPage() {
+	    currentPage++;
+	    fetchBooks();
+	  }
+
+	  // Initial fetch
+	  fetchBooks();
+
+
+  </script>
+
+</body>
+</html>
